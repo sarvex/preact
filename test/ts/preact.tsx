@@ -103,9 +103,9 @@ const UseOfComponentWithChildren = () => {
 };
 
 // TODO: make this work
-// const DummyChildren: FunctionalComponent = ({ children }) => {
-// 	return children;
-// };
+const DummyChildren: FunctionalComponent = ({ children }) => {
+	return children;
+};
 
 // function ReturnChildren(props: { children: preact.ComponentChildren }) {
 // 	return props.children;

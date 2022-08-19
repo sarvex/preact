@@ -77,6 +77,19 @@ export type RenderableProps<P, RefType = any> = P &
 
 export type ComponentType<P = {}> = ComponentClass<P> | FunctionComponent<P>;
 export type ComponentFactory<P = {}> = ComponentType<P>;
+export type JSXElementConstructor<P> =
+	| ((props: P) => PreactEl<any, any> | null)
+	| (new (props: P) => Component<any, any>);
+export interface PreactEl<
+	P = any,
+	T extends string | JSXElementConstructor<any> =
+		| string
+		| JSXElementConstructor<any>
+> {
+	type: T;
+	props: P;
+	key: Key | null;
+}
 
 export type ComponentProps<
 	C extends ComponentType<any> | keyof JSXInternal.IntrinsicElements
@@ -87,7 +100,7 @@ export type ComponentProps<
 	: never;
 
 export interface FunctionComponent<P = {}> {
-	(props: RenderableProps<P>, context?: any): VNode<any>;
+	(props: RenderableProps<P>, context?: any): PreactEl;
 	displayName?: string;
 	defaultProps?: Partial<P>;
 }
