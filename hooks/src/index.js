@@ -1,4 +1,4 @@
-import { options } from 'preact';
+import { Fragment, options } from 'preact';
 
 /** @type {number} */
 let currentIndex;
@@ -26,8 +26,30 @@ let oldBeforeUnmount = options.unmount;
 const RAF_TIMEOUT = 100;
 let prevRaf;
 
+let mask = '';
+let depth = 0;
+
 options._diff = vnode => {
 	currentComponent = null;
+
+	if (typeof vnode.type === 'function' && vnode.type !== Fragment) {
+		if (vnode._mask) {
+			// already visited, pick up where we left off: (fixes subtree updates)
+			mask = vnode._mask;
+		} else if (depth === 0) {
+			// this is the first component rendered and hasn't been seen, it's a root:
+			vnode._mask = mask = '';
+		} else {
+			// replace mask[depth] with the next character: (basically *mask[depth-1]++)
+			const offset = mask.charCodeAt(depth - 1) + 1;
+			vnode._mask = mask =
+				mask.slice(0, depth - 1) + String.fromCharCode(offset);
+		}
+		// we're about to render the children of this component, push a new level onto the mask:
+		depth++;
+		mask += 'A'; // next level starts off at the base character (code 65) again
+	}
+
 	if (oldBeforeDiff) oldBeforeDiff(vnode);
 };
 
@@ -60,6 +82,12 @@ options._render = vnode => {
 
 options.diffed = vnode => {
 	if (oldAfterDiff) oldAfterDiff(vnode);
+
+	if (typeof vnode.type === 'function' && vnode.type !== Fragment) {
+		// jump back up the stack, remove the last char from the mask:
+		depth--;
+		mask = mask.slice(0, -1);
+	}
 
 	const c = vnode._component;
 	if (c && c.__hooks) {
@@ -364,6 +392,15 @@ export function useErrorBoundary(cb) {
 			errState[1](undefined);
 		}
 	];
+}
+
+// Note: this is the same implementation as preactjs/preact#3583
+export function useId() {
+	const state = getHookState(currentIndex++, 11);
+	if (!state._value) {
+		state._value = 'P' + currentComponent._vnode._mask + currentIndex;
+	}
+	return state._value;
 }
 
 /**
