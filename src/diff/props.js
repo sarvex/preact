@@ -147,9 +147,15 @@ export function setProperty(dom, name, value, oldValue, isSvg) {
  * @private
  */
 function eventProxy(e) {
+	const prevTimeout = options.debounceRendering;
+	options.debounceRendering = setTimeout;
 	this._listeners[e.type + false](options.event ? options.event(e) : e);
+	options.debounceRendering = prevTimeout;
 }
 
 function eventProxyCapture(e) {
+	const prevTimeout = options.debounceRendering;
+	options.debounceRendering = setTimeout;
 	this._listeners[e.type + true](options.event ? options.event(e) : e);
+	options.debounceRendering = prevTimeout;
 }

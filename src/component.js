@@ -180,6 +180,16 @@ let rerenderQueue = [];
  */
 
 let prevDebounce;
+/**
+ * Asynchronously schedule a callback
+ * @type {(cb: () => void) => void}
+ */
+/* istanbul ignore next */
+// Note the following line isn't tree-shaken by rollup cuz of rollup/rollup#2566
+const defer =
+	typeof Promise == 'function'
+		? Promise.prototype.then.bind(Promise.resolve())
+		: setTimeout;
 
 /**
  * Enqueue a rerender of a component
@@ -194,7 +204,7 @@ export function enqueueRender(c) {
 		prevDebounce !== options.debounceRendering
 	) {
 		prevDebounce = options.debounceRendering;
-		(prevDebounce || setTimeout)(process);
+		(prevDebounce || defer)(process);
 	}
 }
 
