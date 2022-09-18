@@ -237,7 +237,7 @@ export function useReducer(reducer, initialState, init) {
 					? prevScu
 						? prevScu.call(this, p, s, c)
 						: true
-					: false;
+					: shallowDiffers(this.props, p);
 			};
 		}
 	}
@@ -499,4 +499,16 @@ function argsChanged(oldArgs, newArgs) {
 
 function invokeOrReturn(arg, f) {
 	return typeof f == 'function' ? f(arg) : f;
+}
+
+/**
+ * Check if two objects have a different shape
+ * @param {object} a
+ * @param {object} b
+ * @returns {boolean}
+ */
+function shallowDiffers(a, b) {
+	for (let i in a) if (i !== '__source' && !(i in b)) return true;
+	for (let i in b) if (i !== '__source' && a[i] !== b[i]) return true;
+	return false;
 }
