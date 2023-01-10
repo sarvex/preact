@@ -41,7 +41,7 @@ options._render = vnode => {
 	if (hooks) {
 		if (previousComponent === currentComponent) {
 			hooks._pendingEffects = [];
-			vnode._renderCallbacks = [];
+			currentComponent._renderCallbacks = [];
 			hooks._list.forEach(hookItem => {
 				if (hookItem._nextValue) {
 					hookItem._value = hookItem._nextValue;
@@ -260,7 +260,7 @@ export function useLayoutEffect(callback, args) {
 		state._value = callback;
 		state._pendingArgs = args;
 
-		currentComponent._vnode._renderCallbacks.push(state);
+		currentComponent._renderCallbacks.push(state);
 	}
 }
 
