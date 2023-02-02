@@ -74,23 +74,23 @@ declare namespace React {
 
 	export function createPortal(
 		vnode: preact.VNode,
-		container: Element
+		container: preact.ContainerNode
 	): preact.VNode<any>;
 
 	export function render(
 		vnode: preact.VNode<any>,
-		parent: Element,
+		parent: preact.ContainerNode,
 		callback?: () => void
 	): Component | null;
 
 	export function hydrate(
 		vnode: preact.VNode<any>,
-		parent: Element,
+		parent: preact.ContainerNode,
 		callback?: () => void
 	): Component | null;
 
 	export function unmountComponentAtNode(
-		container: Element | Document | ShadowRoot | DocumentFragment
+		container: preact.ContainerNode
 	): boolean;
 
 	export function createFactory(
@@ -135,8 +135,11 @@ declare namespace React {
 	interface MutableRefObject<T> {
 		current: T;
 	}
-	
-	export type ForwardedRef<T> = ((instance: T | null) => void) | MutableRefObject<T | null> | null;
+
+	export type ForwardedRef<T> =
+		| ((instance: T | null) => void)
+		| MutableRefObject<T | null>
+		| null;
 
 	export function unstable_batchedUpdates(
 		callback: (arg?: any) => void,
@@ -144,9 +147,9 @@ declare namespace React {
 	): void;
 
 	export type PropsWithChildren<P = unknown> = P & {
-		children?: preact.ComponentChild | undefined
+		children?: preact.ComponentChild | undefined;
 	};
-	
+
 	export const Children: {
 		map<T extends preact.ComponentChild, R>(
 			children: T | T[],
